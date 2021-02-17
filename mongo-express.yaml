@@ -3,6 +3,7 @@ kind: Deployment
 metadata:
   name: mongo-express
 spec:
+  replicas: 1
   selector:
     matchLabels:
       app: mongo-express
@@ -13,11 +14,7 @@ spec:
     spec:
       containers:
       - name: mongo-express
-        image: mongo-express
-        resources:
-          limits:
-            memory: "128Mi"
-            cpu: "500m"
+        image: mongo-express:latest
         ports:
         - containerPort: 8081
         envFrom:
@@ -25,3 +22,18 @@ spec:
             name: mongo-secret
         - configMapRef:
             name: mongodb-configmap
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-express-service
+spec:
+  selector:
+    app: mongo-express
+  type: LoadBalancer
+  ports:
+  - protocol: TCP
+    port: 8081
+    targetPort: 8081
+    nodePort: 30000
+     
